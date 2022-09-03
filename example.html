@@ -8,26 +8,14 @@
             padding: 0;
         }
 
-        .section:nth-child(2),  .section:nth-child(4) {
-            opacity: 0.7;
-        }
 
-        .section .slide {
-            background: blue;
-            color: white;
-            text-align: center;
-        }
-
-        .section .slide:nth-child(2) {
-            background-color: red;
-        }
 
     </style>
 </head>
 <body>
 <main>
     <section>
-        <slide>
+        <slide style="background-color:red">
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur convallis neque eu metus auctor
                 rhoncus. Fusce bibendum at enim id tincidunt. Duis varius ac nibh porta semper. Cras nec felis id tellus
                 consequat auctor at sed magna. Praesent suscipit, turpis cursus sodales lacinia, ipsum eros ultrices
@@ -37,35 +25,41 @@
                 enim. Nunc sed consectetur lorem.
             </p>
         </slide>
-        <slide>
+        <slide style="background-color:green">
             <img
-                    style="width: 200px;height: auto"
+                    style="width: 50vw"
                     src="https://www.referenseo.com/wp-content/uploads/2019/03/image-attractive-960x540.jpg">
         </slide>
     </section>
-    <section>
+    <section style="background-color:blue">
             Slide 2.2
     </section>
     <section>
-        <slide>
+        <slide style="background-color:purple">
             Slide 3
         </slide>
     </section>
     <section>
-        <slide>
+        <slide style="background-color:yellow">
             Slide 4
         </slide>
-        <slide>
+        <slide style="background-color:grey">
             Slide 5
         </slide>
-        <slide>
+        <slide id="custom" style="background-color:orange">
             Slide 6
         </slide>
     </section>
 </main>
 <script type="text/javascript" src="dist/pager.js"></script>
 <script type="text/javascript">
-    pager('main');
+    pager('main', {
+        zoom: true,
+        keyboard:true,
+        infinite:{
+            section:true, slide:true
+        }
+    });
 </script>
 </body>
 </html>

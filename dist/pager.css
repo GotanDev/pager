@@ -1,8 +1,11 @@
 .pager {
   width: 100vw;
   min-height: 100vh;
+  scroll-behavior: smooth;
   display: flex;
   flex-direction: column;
+  transform-origin: 0 0;
+  transition: transform 750ms;
 }
 .pager .container {
   display: block;
@@ -19,6 +22,7 @@
 }
 .pager .section.slides {
   justify-content: start;
+  overflow-x: scroll;
 }
 .pager .section.slides > .container {
   flex-direction: row;
@@ -31,4 +35,17 @@
   min-height: 100vh;
   justify-content: center;
   align-items: center;
+}
+.pager.zoom .section.slides {
+  overflow-x: visible;
+}
+.pager.zoom .section .container {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.pager.zoom .section .container:hover {
+  opacity: 1;
+}
+.pager.zoom .active .container {
+  opacity: 1;
 }

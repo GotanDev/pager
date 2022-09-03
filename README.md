@@ -4,6 +4,12 @@ Display your *single page website* as a multi fullscreen sections magazine.
 
 Fully responsive rendering. 
 
+## Main features
+
+* Hash management for section direct access
+* Zoom management : you can view whole page by zoom out 
+* Keyboard navigation
+
 ## Install 
 ```bash
 npm install gotan/pager 
@@ -29,8 +35,13 @@ Your HTML code should have the following structure
 ```
 And add simple following javascript
 ```js
-pager('.magazine') 
+pager('.magazine', {}) 
 ```
+
+Options are: 
+
+* `keyboard`: Enable keyboard navigation
+* `zoom`: Enable zoom out for giving global section map
 
 Look at [example](example.html).
 
