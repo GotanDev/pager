@@ -1,0 +1,40 @@
+.pager {
+  width: 100vw;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  .container {
+    display: block;
+    width: fit-content;
+    height: fit-content;
+  }
+
+  .section {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+
+    &.slides {
+      justify-content: start;
+
+      > .container {
+        flex-direction: row;
+        display: flex;
+        flex-wrap: nowrap;
+      }
+    }
+
+    .slide {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}

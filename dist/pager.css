@@ -1,0 +1,34 @@
+.pager {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.pager .container {
+  display: block;
+  width: fit-content;
+  height: fit-content;
+}
+.pager .section {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+.pager .section.slides {
+  justify-content: start;
+}
+.pager .section.slides > .container {
+  flex-direction: row;
+  display: flex;
+  flex-wrap: nowrap;
+}
+.pager .section .slide {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+}

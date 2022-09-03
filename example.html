@@ -1,0 +1,71 @@
+<html>
+<head>
+    <title>Pager Example</title>
+    <link rel="stylesheet" href="dist/pager.css"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .section:nth-child(2),  .section:nth-child(4) {
+            opacity: 0.7;
+        }
+
+        .section .slide {
+            background: blue;
+            color: white;
+            text-align: center;
+        }
+
+        .section .slide:nth-child(2) {
+            background-color: red;
+        }
+
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <slide>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur convallis neque eu metus auctor
+                rhoncus. Fusce bibendum at enim id tincidunt. Duis varius ac nibh porta semper. Cras nec felis id tellus
+                consequat auctor at sed magna. Praesent suscipit, turpis cursus sodales lacinia, ipsum eros ultrices
+                dolor, at finibus arcu nunc ac lacus. Donec dignissim, libero eget scelerisque accumsan, sem ante cursus
+                sem, quis blandit arcu eros et ante. Etiam sit amet venenatis ipsum, nec consequat magna. Praesent
+                suscipit augue quis urna volutpat porta. Proin accumsan vitae orci et fermentum. Etiam vitae tristique
+                enim. Nunc sed consectetur lorem.
+            </p>
+        </slide>
+        <slide>
+            <img
+                    style="width: 200px;height: auto"
+                    src="https://www.referenseo.com/wp-content/uploads/2019/03/image-attractive-960x540.jpg">
+        </slide>
+    </section>
+    <section>
+            Slide 2.2
+    </section>
+    <section>
+        <slide>
+            Slide 3
+        </slide>
+    </section>
+    <section>
+        <slide>
+            Slide 4
+        </slide>
+        <slide>
+            Slide 5
+        </slide>
+        <slide>
+            Slide 6
+        </slide>
+    </section>
+</main>
+<script type="text/javascript" src="dist/pager.js"></script>
+<script type="text/javascript">
+    pager('main');
+</script>
+</body>
+</html>

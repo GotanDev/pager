@@ -1,0 +1,33 @@
+{
+  "name": "pager",
+  "author": "Damien Cuvillier <damien@gotan.io>",
+  "description": "Full page pager",
+  "version": "1.0.0",
+  "devDependencies": {
+    "livereload": "^0.9.3",
+    "npm-watch": "^0.11.0",
+    "sass": "^1.54.8",
+    "serve": "^14.0.1",
+    "typescript": "^4.8.2"
+  },
+  "watch": {
+    "compile-ts": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "ts"
+    },
+    "compile-scss": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "scss"
+    }
+  },
+  "scripts": {
+    "build": "npm run compile-ts && npm run compile-scss",
+    "compile-ts": "tsc --build",
+    "compile-scss": "sass src/pager.scss > dist/pager.css",
+    "dev": "(serve &) && (livereload &) && npm-watch"
+  }
+}
