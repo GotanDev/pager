@@ -1,8 +1,8 @@
 # Pager JS
 
-Display your *single page website* as a multi fullscreen magazine.
+Display your *single page website* as a multi fullscreen sections magazine.
 
-
+Fully responsive rendering. 
 
 ## Install 
 ```bash
