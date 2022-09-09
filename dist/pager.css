@@ -2,7 +2,7 @@
 .pager {
   --backgroundColor1: #333333;
   --foregroundColor1: #FFFFFF;
-  --backgroundColor2: #DDDDDDD;
+  --backgroundColor2: #AAAAAA;
   --foregroundColor2: #333333;
   width: 100vw;
   min-height: 100vh;
@@ -13,7 +13,8 @@
   transition: transform 750ms;
   /* Generic Arrow */
 }
-.pager:before {
+.pager.debug:before {
+  z-index: 10;
   content: "";
   display: block;
   position: fixed;
@@ -23,7 +24,8 @@
   top: 0;
   background-color: red;
 }
-.pager:after {
+.pager.debug:after {
+  z-index: 10;
   content: "";
   display: block;
   position: fixed;
@@ -73,11 +75,11 @@
   position: relative;
   flex-wrap: nowrap;
 }
-.pager .section:nth-child(2n) {
+.pager .section:nth-child(2n) .slide {
   background-color: var(--backgroundColor1);
   color: var(--foregroundColor1);
 }
-.pager .section:nth-child(2n+1) {
+.pager .section:nth-child(2n+1) .slide {
   background-color: var(--backgroundColor2);
   color: var(--foregroundColor2);
 }
@@ -139,23 +141,24 @@
   content: "\e5e1";
 }
 .pager .section .slide:nth-child(2n) {
-  filter: brightness(0.8);
+  filter: brightness(0.9);
 }
 .pager .section .slide:nth-child(2n+1) {
-  filter: brightness(0.99);
+  filter: brightness(1);
 }
 .pager.zoom .arrow {
-  opacity: 0;
+  visibility: hidden;
 }
 .pager.zoom .section.slides {
   overflow-x: visible;
 }
-.pager.zoom .section .container {
+.pager.zoom .section .slide {
   opacity: 0.8;
   cursor: pointer;
 }
-.pager.zoom .section .container:hover {
+.pager.zoom .section .slide:hover {
   opacity: 1;
+  box-shadow: inset #333333 0 0 20px 10px;
 }
 .pager.zoom .active .container {
   opacity: 1;

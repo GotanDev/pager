@@ -29,7 +29,7 @@
         </slide>
     </section>
     <section>
-            <p>Slide 2.2</p>
+        <p>Slide 2.2</p>
     </section>
     <section>
         <slide>
@@ -47,17 +47,36 @@
             Slide 6
         </slide>
     </section>
+    <section>
+        <slide>
+            Slide 7
+        </slide>
+        <slide>
+            Slide 8
+        </slide>
+        <slide id="custom2">
+            Slide 9
+        </slide>
+    </section>
+    <section>
+        <p>Slide 10</p>
+    </section>
+    <section>
+        <p>Slide 11</p>
+    </section>
 </main>
 <script type="text/javascript" src="dist/pager.js"></script>
 <script type="text/javascript">
     pager('main', {
         zoom: true,
-        keyboard:true,
-        infinite:{
-            section:false, slide:true
+        keyboard: true,
+        theme: 'rainbow',
+        infinite: {
+            section: true, slide: true
         }, arrows: {
-            section:true, slide:true
-        }
+            section: true, slide: true
+        },
+        debug: false
     });
 </script>
 </body>

@@ -9,7 +9,30 @@ function pager(cssSelector, options = {}) {
 
         private _self: Pager;
 
+
+        private colorThemes = {
+            // Thanks https://coolors.co/
+            'default': {
+                odd: {background: '#333333', foreground: "#FFFFFF"},
+                even: {background: '#999999', foreground: '#FFFFFF'}
+            },
+            'cyan': {
+                odd: {background: '#19647E', foreground: "#FFFFFF"},
+                even: {background: '#28AFB0', foreground: '#FFFFFF'}
+            },
+            'rainbow': [
+                {background: '#1F271B', foreground: '#FAFAFA'},
+                {background: '#19647E', foreground: '#FAFAFA'},
+                {background: '#28AFB0', foreground: '#FAFAFA'},
+                {background: '#F4D35E', foreground: '#1F271B'},
+                {background: '#EE964B', foreground: '#1F271B'}
+            ]
+        };
+
+
         private defaultOptions = {
+            // Color theme
+            theme: 'default',
             // Enable keyboard navigation
             keyboard: false,
             // Global map enabled
@@ -21,11 +44,14 @@ function pager(cssSelector, options = {}) {
                 slide: true
             },
             arrows: {
+                // Display arrows for vertical navigation
                 section: false,
+                // Display arrows for horizontal navigation
                 slide: true
-            }
-
+            },
+            debug: false
         };
+
 
         private options: any;
 
@@ -37,6 +63,7 @@ function pager(cssSelector, options = {}) {
                 ...options
             }
             this.init(cssSelector);
+            this.loadColorTheme();
         }
 
         /** Initiate pager
@@ -55,8 +82,13 @@ function pager(cssSelector, options = {}) {
 
             // CSS classes, id & position init
             this.container.classList.add('pager');
+            if (this.options.debug) {
+                this.container.classList.add('debug');
+            }
+
             let sectionCount = 0;
-            this.container.querySelectorAll('section, .section').forEach(section => {
+            const sections = this.container.querySelectorAll('section, .section');
+            sections.forEach(section => {
                 (section as HTMLElement).classList.add('section');
                 (section as HTMLElement).dataset.sectionId = "" + (sectionCount);
                 if (section.id == '') {
@@ -69,7 +101,7 @@ function pager(cssSelector, options = {}) {
                 this.addIntermediateContainer(section);
 
 
-                if (this.options.arrows.section) {
+                if (this.options.arrows.section && sections.length > 1) {
                     if (section.previousElementSibling != null || this.options.infinite.section) {
                         const arrow = document.createElement('arrow');
                         arrow.classList.add('prev', 'arrow');
@@ -83,14 +115,14 @@ function pager(cssSelector, options = {}) {
                         section.appendChild(arrow);
                     }
                 }
-                const slidesCount = section.querySelectorAll('.slide').length;
-                if (slidesCount > 1) {
+                const slides = section.querySelectorAll('.slide, slide');
+                if (slides.length > 1) {
                     // Define global with for multi slides section
-                    (section.querySelector('.container') as HTMLElement).style.width = (100 * slidesCount) + 'vw';
+                    (section.querySelector('.container') as HTMLElement).style.width = (100 * slides.length) + 'vw';
                     section.classList.add('slides');
                 }
                 let slideCount = 0;
-                section.querySelectorAll('slide, .slide').forEach(slide => {
+                slides.forEach(slide => {
                     (slide as HTMLElement).classList.add('slide');
                     (slide as HTMLElement).dataset.sectionId = "" + (sectionCount);
                     (slide as HTMLElement).dataset.slideId = "" + (slideCount);
@@ -100,13 +132,13 @@ function pager(cssSelector, options = {}) {
                     // Add intermediate container in each level to allow scrolling
                     this.addIntermediateContainer(slide);
 
-                    if (slide.previousElementSibling != null || this.options.infinite.slide) {
+                    if (slides.length > 1 && this.options.arrows.slide && (slide.previousElementSibling != null || this.options.infinite.slide)) {
                         let arrow = document.createElement('arrow');
                         arrow.classList.add('prev', 'arrow');
                         arrow.onclick = this.previousSlide;
                         slide.appendChild(arrow);
                     }
-                    if (slide.nextElementSibling != null || this.options.infinite.slide) {
+                    if (slides.length > 1 && this.options.arrows.slide && (slide.nextElementSibling != null || this.options.infinite.slide)) {
                         let arrow = document.createElement('arrow');
                         arrow.classList.add('next', 'arrow');
                         arrow.onclick = this.nextSlide;
@@ -182,7 +214,6 @@ function pager(cssSelector, options = {}) {
 
 
         private hashManagement() {
-
             if ((window as any).nohashtrigger) {
                 delete (window as any).nohashtrigger;
                 return;
@@ -278,23 +309,39 @@ function pager(cssSelector, options = {}) {
             } else {
                 activeElement = container.querySelector(` .section[data-section-id="${sectionId}"] .slide[data-slide-id="${slideId}"]`);
             }
-            console.log(`Goto [${sectionId},${slideId}]`);
+            if (this.options.debug) console.log(`Goto [${sectionId},${slideId}]`);
             if (activeElement == null) {
                 throw new Error(`No slide '${sectionId}.${slideId}' available`);
             }
 
             activeElement.classList.add('active');
-            (window as any).scrollBy({
-                left: 0,
-                top: activeElement.offsetTop - window.scrollY ?? 0,
-                behavior: scrollBehavior
-            });
-            if (activeElement.classList.contains('slide')) {
-                activeElement.closest('.section').scrollBy({
-                    left: activeElement.offsetLeft - (isNaN(activeElement.scrollX) ? 0 : activeElement.scrollX),
-                    top: 0,
+
+            const top = activeElement?.closest('.section') != null ? activeElement?.closest('.section')?.offsetTop - window.scrollY : 0;
+            if (top !== 0) {
+                if (this.options.debug) {
+                    console.log('Vertical offset scroll: ' + top + 'px');
+                }
+                (window as any).scrollBy({
+                    left: 0,
+                    top: top,
                     behavior: scrollBehavior
                 });
+            }
+
+            if (activeElement.classList.contains('slide')) {
+                const section = activeElement.closest('.section')
+                const left = activeElement.offsetLeft - (isNaN(section.scrollLeft) ? 0 : section.scrollLeft);
+                if (left > 0) {
+                    if (this.options.debug) {
+                        console.log('Horizontal offset scroll: ' + left + 'px');
+                    }
+                    section.scrollBy({
+                        left: left,
+                        top: 0,
+                        behavior: scrollBehavior
+                    });
+                }
+
             }
 
             (window as any).nohashtrigger = true
@@ -311,7 +358,6 @@ function pager(cssSelector, options = {}) {
         public nextSlide() {
             const pager = (document.querySelector('.pager') as any);
             const activeElement = (pager.querySelector('.active') as HTMLElement);
-            const sectionId = parseInt(activeElement.dataset.sectionId);
             let targetElement = null;
             if (activeElement.classList.contains('section')) {
                 targetElement = activeElement.querySelector('.slide');
@@ -402,6 +448,43 @@ function pager(cssSelector, options = {}) {
             }
         }
 
+        /** Load color theme
+         *
+         * Will use options.theme variable.
+         * Can be
+         * - either a *themeName* (picked in colorThemes array)
+         * - either an odd/even model : {odd: {background: '#hexCode', foreground: '#hexCode'}, even: {backgorund:'', 'foreground:''}}
+         * - or a color tuples array [{background: '#hexCode', foreground: '#hexCode'}, ...]
+         * @private
+         */
+        private loadColorTheme() {
+            if (typeof this.options.theme === 'string') {
+                if (this.colorThemes[this.options.theme] == null) {
+                    if (this.options.debug) {
+                        console.log("Fallback color theme to default");
+                    }
+                    this.options.theme = 'default';
+                }
+                this.options.theme = this.colorThemes[this.options.theme];
+            }
+            if (this.options.theme instanceof Array) {
+                this.container.querySelectorAll('.section').forEach((section: HTMLElement, idx) => {
+                    const activeColorTuple = this.options.theme[idx % this.options.theme.length];
+                    section.querySelectorAll('.slide').forEach((slide: HTMLElement) => {
+                        slide.style.backgroundColor = activeColorTuple.background;
+                        slide.style.color = activeColorTuple.foreground;
+                    });
+                });
+            } else {
+                if (this.options.theme.odd == null || this.options.theme.even == null) {
+                    throw new Error('You must defined odd and even properties in color theme');
+                }
+                this.container.style.setProperty('--backgroundColor1', this.options.theme.odd.background);
+                this.container.style.setProperty('--foreground1', this.options.theme.odd.foreground);
+                this.container.style.setProperty('--backgroundColor2', this.options.theme.even.background);
+                this.container.style.setProperty('--foreground2', this.options.theme.even.foreground);
+            }
+        }
     }
 
     return function () {
@@ -410,4 +493,6 @@ function pager(cssSelector, options = {}) {
             container: this.container
         };
     }();
+
+
 }

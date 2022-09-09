@@ -14,7 +14,25 @@ function pager(cssSelector, options) {
     var Pager = (function () {
         function Pager(cssSelector, options) {
             if (options === void 0) { options = {}; }
+            this.colorThemes = {
+                'default': {
+                    odd: { background: '#333333', foreground: "#FFFFFF" },
+                    even: { background: '#999999', foreground: '#FFFFFF' }
+                },
+                'cyan': {
+                    odd: { background: '#19647E', foreground: "#FFFFFF" },
+                    even: { background: '#28AFB0', foreground: '#FFFFFF' }
+                },
+                'rainbow': [
+                    { background: '#1F271B', foreground: '#FAFAFA' },
+                    { background: '#19647E', foreground: '#FAFAFA' },
+                    { background: '#28AFB0', foreground: '#FAFAFA' },
+                    { background: '#F4D35E', foreground: '#1F271B' },
+                    { background: '#EE964B', foreground: '#1F271B' }
+                ]
+            };
             this.defaultOptions = {
+                theme: 'default',
                 keyboard: false,
                 zoom: false,
                 infinite: {
@@ -24,11 +42,13 @@ function pager(cssSelector, options) {
                 arrows: {
                     section: false,
                     slide: true
-                }
+                },
+                debug: false
             };
             this._self = this;
             this.options = __assign(__assign({}, this.defaultOptions), options);
             this.init(cssSelector);
+            this.loadColorTheme();
         }
         Pager.prototype.init = function (cssSelector) {
             var _this = this;
@@ -39,8 +59,12 @@ function pager(cssSelector, options) {
             window.pagerInstance = this;
             this.container.options = this.options;
             this.container.classList.add('pager');
+            if (this.options.debug) {
+                this.container.classList.add('debug');
+            }
             var sectionCount = 0;
-            this.container.querySelectorAll('section, .section').forEach(function (section) {
+            var sections = this.container.querySelectorAll('section, .section');
+            sections.forEach(function (section) {
                 section.classList.add('section');
                 section.dataset.sectionId = "" + (sectionCount);
                 if (section.id == '') {
@@ -50,7 +74,7 @@ function pager(cssSelector, options) {
                     _this.addIntermediateContainer(section, 'slide');
                 }
                 _this.addIntermediateContainer(section);
-                if (_this.options.arrows.section) {
+                if (_this.options.arrows.section && sections.length > 1) {
                     if (section.previousElementSibling != null || _this.options.infinite.section) {
                         var arrow = document.createElement('arrow');
                         arrow.classList.add('prev', 'arrow');
@@ -64,13 +88,13 @@ function pager(cssSelector, options) {
                         section.appendChild(arrow);
                     }
                 }
-                var slidesCount = section.querySelectorAll('.slide').length;
-                if (slidesCount > 1) {
-                    section.querySelector('.container').style.width = (100 * slidesCount) + 'vw';
+                var slides = section.querySelectorAll('.slide, slide');
+                if (slides.length > 1) {
+                    section.querySelector('.container').style.width = (100 * slides.length) + 'vw';
                     section.classList.add('slides');
                 }
                 var slideCount = 0;
-                section.querySelectorAll('slide, .slide').forEach(function (slide) {
+                slides.forEach(function (slide) {
                     slide.classList.add('slide');
                     slide.dataset.sectionId = "" + (sectionCount);
                     slide.dataset.slideId = "" + (slideCount);
@@ -78,13 +102,13 @@ function pager(cssSelector, options) {
                         slide.id = "slide-".concat(sectionCount, "-").concat(slideCount);
                     }
                     _this.addIntermediateContainer(slide);
-                    if (slide.previousElementSibling != null || _this.options.infinite.slide) {
+                    if (slides.length > 1 && _this.options.arrows.slide && (slide.previousElementSibling != null || _this.options.infinite.slide)) {
                         var arrow = document.createElement('arrow');
                         arrow.classList.add('prev', 'arrow');
                         arrow.onclick = _this.previousSlide;
                         slide.appendChild(arrow);
                     }
-                    if (slide.nextElementSibling != null || _this.options.infinite.slide) {
+                    if (slides.length > 1 && _this.options.arrows.slide && (slide.nextElementSibling != null || _this.options.infinite.slide)) {
                         var arrow = document.createElement('arrow');
                         arrow.classList.add('next', 'arrow');
                         arrow.onclick = _this.nextSlide;
@@ -217,22 +241,36 @@ function pager(cssSelector, options) {
             else {
                 activeElement = container.querySelector(" .section[data-section-id=\"".concat(sectionId, "\"] .slide[data-slide-id=\"").concat(slideId, "\"]"));
             }
-            console.log("Goto [".concat(sectionId, ",").concat(slideId, "]"));
+            if (this.options.debug)
+                console.log("Goto [".concat(sectionId, ",").concat(slideId, "]"));
             if (activeElement == null) {
                 throw new Error("No slide '".concat(sectionId, ".").concat(slideId, "' available"));
             }
             activeElement.classList.add('active');
-            window.scrollBy({
-                left: 0,
-                top: (_a = activeElement.offsetTop - window.scrollY) !== null && _a !== void 0 ? _a : 0,
-                behavior: scrollBehavior
-            });
-            if (activeElement.classList.contains('slide')) {
-                activeElement.closest('.section').scrollBy({
-                    left: activeElement.offsetLeft - (isNaN(activeElement.scrollX) ? 0 : activeElement.scrollX),
-                    top: 0,
+            var top = (activeElement === null || activeElement === void 0 ? void 0 : activeElement.closest('.section')) != null ? ((_a = activeElement === null || activeElement === void 0 ? void 0 : activeElement.closest('.section')) === null || _a === void 0 ? void 0 : _a.offsetTop) - window.scrollY : 0;
+            if (top !== 0) {
+                if (this.options.debug) {
+                    console.log('Vertical offset scroll: ' + top + 'px');
+                }
+                window.scrollBy({
+                    left: 0,
+                    top: top,
                     behavior: scrollBehavior
                 });
+            }
+            if (activeElement.classList.contains('slide')) {
+                var section = activeElement.closest('.section');
+                var left = activeElement.offsetLeft - (isNaN(section.scrollLeft) ? 0 : section.scrollLeft);
+                if (left > 0) {
+                    if (this.options.debug) {
+                        console.log('Horizontal offset scroll: ' + left + 'px');
+                    }
+                    section.scrollBy({
+                        left: left,
+                        top: 0,
+                        behavior: scrollBehavior
+                    });
+                }
             }
             window.nohashtrigger = true;
             window.location.hash = '#' + activeElement.id;
@@ -245,7 +283,6 @@ function pager(cssSelector, options) {
         Pager.prototype.nextSlide = function () {
             var pager = document.querySelector('.pager');
             var activeElement = pager.querySelector('.active');
-            var sectionId = parseInt(activeElement.dataset.sectionId);
             var targetElement = null;
             if (activeElement.classList.contains('section')) {
                 targetElement = activeElement.querySelector('.slide');
@@ -326,6 +363,36 @@ function pager(cssSelector, options) {
             }
             if (targetElement != null) {
                 pager.gotoElement(targetElement);
+            }
+        };
+        Pager.prototype.loadColorTheme = function () {
+            var _this = this;
+            if (typeof this.options.theme === 'string') {
+                if (this.colorThemes[this.options.theme] == null) {
+                    if (this.options.debug) {
+                        console.log("Fallback color theme to default");
+                    }
+                    this.options.theme = 'default';
+                }
+                this.options.theme = this.colorThemes[this.options.theme];
+            }
+            if (this.options.theme instanceof Array) {
+                this.container.querySelectorAll('.section').forEach(function (section, idx) {
+                    var activeColorTuple = _this.options.theme[idx % _this.options.theme.length];
+                    section.querySelectorAll('.slide').forEach(function (slide) {
+                        slide.style.backgroundColor = activeColorTuple.background;
+                        slide.style.color = activeColorTuple.foreground;
+                    });
+                });
+            }
+            else {
+                if (this.options.theme.odd == null || this.options.theme.even == null) {
+                    throw new Error('You must defined odd and even properties in color theme');
+                }
+                this.container.style.setProperty('--backgroundColor1', this.options.theme.odd.background);
+                this.container.style.setProperty('--foreground1', this.options.theme.odd.foreground);
+                this.container.style.setProperty('--backgroundColor2', this.options.theme.even.background);
+                this.container.style.setProperty('--foreground2', this.options.theme.even.foreground);
             }
         };
         return Pager;

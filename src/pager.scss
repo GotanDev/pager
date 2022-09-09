@@ -6,28 +6,33 @@
 .pager {
   --backgroundColor1: #333333;
   --foregroundColor1: #FFFFFF;
-  --backgroundColor2: #DDDDDDD;
+  --backgroundColor2: #AAAAAA;
   --foregroundColor2: #333333;
 
-  &:before {
-    content: "";
-    display: block;
-    position: fixed;
-    left: calc(50% - 1px);
-    width: 2px;
-    height: 100vh;
-    top: 0;
-    background-color: red;
-  }
-  &:after {
-    content: "";
-    display: block;
-    position: fixed;
-    top: calc(50% - 1px);
-    height: 2px;
-    width: 100vw;
-    left:0;
-    background-color: red;
+  &.debug {
+    &:before {
+      z-index: 10;
+      content: "";
+      display: block;
+      position: fixed;
+      left: calc(50% - 1px);
+      width: 2px;
+      height: 100vh;
+      top: 0;
+      background-color: red;
+    }
+
+    &:after {
+      z-index: 10;
+      content: "";
+      display: block;
+      position: fixed;
+      top: calc(50% - 1px);
+      height: 2px;
+      width: 100vw;
+      left: 0;
+      background-color: red;
+    }
   }
 
   width: 100vw;
@@ -60,7 +65,6 @@
       transition: all 0.2s;
     }
 
-
     position: absolute;
     display: block;
     width: 30px;
@@ -70,6 +74,7 @@
 
     &:hover {
       transform: scale(1);
+
       &:before {
         opacity: 1;
         font-size: 50px;
@@ -87,12 +92,12 @@
     position: relative;
     flex-wrap: nowrap;
 
-    &:nth-child(2n) {
+    &:nth-child(2n) .slide {
       background-color: var(--backgroundColor1);
       color: var(--foregroundColor1);
     }
 
-    &:nth-child(2n+1) {
+    &:nth-child(2n+1) .slide {
       background-color: var(--backgroundColor2);
       color: var(--foregroundColor2);
     }
@@ -101,20 +106,25 @@
     > .arrow {
       left: calc(50% - 25px);
       width: 50px;
-      text-align:center;
+      text-align: center;
+
       &.prev {
         top: 5px;
+
         &:before {
           content: '\eacf';
         }
+
         transform-origin: 50% 0;
       }
 
       &.next {
         bottom: 5px;
+
         &:before {
           content: '\ead0';
         }
+
         transform-origin: 50% 100%;
       }
     }
@@ -145,8 +155,9 @@
 
         &.prev {
           left: 15px;
-          text-align:left;
+          text-align: left;
           transform-origin: 0 50%;
+
           &:before {
             content: '\e5e0';
           }
@@ -155,7 +166,8 @@
         &.next {
           right: 15px;
           transform-origin: 100% 50%;
-          text-align:right;
+          text-align: right;
+
           &:before {
             content: '\e5e1';
           }
@@ -163,34 +175,32 @@
       }
 
       &:nth-child(2n) {
-        filter: brightness(0.8);
+        filter: brightness(0.9);
       }
 
       &:nth-child(2n+1) {
-        filter: brightness(0.99);
+        filter: brightness(1);
       }
     }
   }
 
   &.zoom {
     .arrow {
-      opacity: 0;
+      visibility: hidden;
     }
-
     .section {
       &.slides {
         overflow-x: visible;
       }
 
 
-      .container {
+      .slide {
         opacity: 0.8;
-
+        cursor: pointer;
         &:hover {
           opacity: 1;
+          box-shadow: inset #333333 0 0 20px 10px;
         }
-
-        cursor: pointer;
       }
     }
 
@@ -199,6 +209,5 @@
         opacity: 1
       }
     }
-
   }
 }
