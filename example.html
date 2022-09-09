@@ -7,15 +7,12 @@
             margin: 0;
             padding: 0;
         }
-
-
-
     </style>
 </head>
 <body>
 <main>
     <section>
-        <slide style="background-color:red">
+        <slide>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur convallis neque eu metus auctor
                 rhoncus. Fusce bibendum at enim id tincidunt. Duis varius ac nibh porta semper. Cras nec felis id tellus
                 consequat auctor at sed magna. Praesent suscipit, turpis cursus sodales lacinia, ipsum eros ultrices
@@ -25,28 +22,28 @@
                 enim. Nunc sed consectetur lorem.
             </p>
         </slide>
-        <slide style="background-color:green">
+        <slide>
             <img
                     style="width: 50vw"
                     src="https://www.referenseo.com/wp-content/uploads/2019/03/image-attractive-960x540.jpg">
         </slide>
     </section>
-    <section style="background-color:blue">
-            Slide 2.2
+    <section>
+            <p>Slide 2.2</p>
     </section>
     <section>
-        <slide style="background-color:purple">
+        <slide>
             Slide 3
         </slide>
     </section>
     <section>
-        <slide style="background-color:yellow">
+        <slide>
             Slide 4
         </slide>
-        <slide style="background-color:grey">
+        <slide>
             Slide 5
         </slide>
-        <slide id="custom" style="background-color:orange">
+        <slide id="custom">
             Slide 6
         </slide>
     </section>
@@ -57,6 +54,8 @@
         zoom: true,
         keyboard:true,
         infinite:{
+            section:false, slide:true
+        }, arrows: {
             section:true, slide:true
         }
     });

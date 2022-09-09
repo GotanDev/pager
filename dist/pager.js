@@ -20,6 +20,10 @@ function pager(cssSelector, options) {
                 infinite: {
                     section: false,
                     slide: true
+                },
+                arrows: {
+                    section: false,
+                    slide: true
                 }
             };
             this._self = this;
@@ -42,6 +46,29 @@ function pager(cssSelector, options) {
                 if (section.id == '') {
                     section.id = "section-".concat(sectionCount);
                 }
+                if (section.querySelector('.slide, slide') == null) {
+                    _this.addIntermediateContainer(section, 'slide');
+                }
+                _this.addIntermediateContainer(section);
+                if (_this.options.arrows.section) {
+                    if (section.previousElementSibling != null || _this.options.infinite.section) {
+                        var arrow = document.createElement('arrow');
+                        arrow.classList.add('prev', 'arrow');
+                        arrow.onclick = _this.previousSection;
+                        section.appendChild(arrow);
+                    }
+                    if (section.nextElementSibling != null || _this.options.infinite.section) {
+                        var arrow = document.createElement('arrow');
+                        arrow.classList.add('next', 'arrow');
+                        arrow.onclick = _this.nextSection;
+                        section.appendChild(arrow);
+                    }
+                }
+                var slidesCount = section.querySelectorAll('.slide').length;
+                if (slidesCount > 1) {
+                    section.querySelector('.container').style.width = (100 * slidesCount) + 'vw';
+                    section.classList.add('slides');
+                }
                 var slideCount = 0;
                 section.querySelectorAll('slide, .slide').forEach(function (slide) {
                     slide.classList.add('slide');
@@ -50,9 +77,24 @@ function pager(cssSelector, options) {
                     if (slide.id == '') {
                         slide.id = "slide-".concat(sectionCount, "-").concat(slideCount);
                     }
+                    _this.addIntermediateContainer(slide);
+                    if (slide.previousElementSibling != null || _this.options.infinite.slide) {
+                        var arrow = document.createElement('arrow');
+                        arrow.classList.add('prev', 'arrow');
+                        arrow.onclick = _this.previousSlide;
+                        slide.appendChild(arrow);
+                    }
+                    if (slide.nextElementSibling != null || _this.options.infinite.slide) {
+                        var arrow = document.createElement('arrow');
+                        arrow.classList.add('next', 'arrow');
+                        arrow.onclick = _this.nextSlide;
+                        slide.appendChild(arrow);
+                    }
                     slideCount++;
                 });
                 sectionCount++;
+            });
+            this.container.querySelectorAll('.section').forEach(function (section) {
             });
             this.container.toggleZoom = this.toggleZoom;
             this.container.goto = this.goto;
@@ -61,15 +103,6 @@ function pager(cssSelector, options) {
             this.container.previousSlide = this.previousSlide;
             this.container.nextSection = this.nextSection;
             this.container.previousSection = this.previousSection;
-            this.container.querySelectorAll('.section').forEach(function (section) {
-                _this.addIntermediateContainer(section);
-                var slidesCount = section.querySelectorAll('.slide').length;
-                if (slidesCount > 1) {
-                    section.querySelector('.container').style.width = (100 * slidesCount) + 'vw';
-                    section.classList.add('slides');
-                    section.querySelectorAll('.slide').forEach(_this.addIntermediateContainer);
-                }
-            });
             if (this.options.keyboard) {
                 document.onkeydown = this.keyboardShortcuts;
             }
@@ -96,9 +129,10 @@ function pager(cssSelector, options) {
                 this.goto(0, 0);
             }
         };
-        Pager.prototype.addIntermediateContainer = function (section) {
-            var container = document.createElement('container');
-            container.classList.add('container');
+        Pager.prototype.addIntermediateContainer = function (section, tagName) {
+            if (tagName === void 0) { tagName = 'container'; }
+            var container = document.createElement(tagName);
+            container.classList.add(tagName);
             container.innerHTML = section.innerHTML;
             section.innerHTML = '';
             section.appendChild(container);
@@ -219,7 +253,7 @@ function pager(cssSelector, options) {
             else if (activeElement.classList.contains('slide')) {
                 var slideId = parseInt(activeElement.dataset.slideId);
                 if (activeElement.nextElementSibling == null) {
-                    if (this.options.infinite.slide) {
+                    if (pager.options.infinite.slide) {
                         targetElement = activeElement.parentElement.firstElementChild;
                     }
                 }
@@ -242,7 +276,7 @@ function pager(cssSelector, options) {
             else {
                 var slideId = parseInt(activeElement.dataset.slideId);
                 if (activeElement.previousElementSibling == null) {
-                    if (this.options.infinite.slide) {
+                    if (pager.options.infinite.slide) {
                         targetElement = activeElement.parentElement.lastElementChild;
                     }
                 }
@@ -263,7 +297,7 @@ function pager(cssSelector, options) {
             var sectionId = parseInt(activeElement.dataset.sectionId);
             var targetElement = null;
             if (activeElement.nextElementSibling == null) {
-                if (this.options.infinite.section) {
+                if (pager.options.infinite.section) {
                     targetElement = activeElement.parentElement.firstElementChild;
                 }
             }
@@ -283,7 +317,7 @@ function pager(cssSelector, options) {
             var sectionId = parseInt(activeElement.dataset.sectionId);
             var targetElement = null;
             if (activeElement.previousElementSibling == null) {
-                if (this.options.infinite.section) {
+                if (pager.options.infinite.section) {
                     targetElement = activeElement.parentElement.lastElementChild;
                 }
             }

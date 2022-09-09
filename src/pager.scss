@@ -1,4 +1,35 @@
+@import '//fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,300,0,200';
+
+
+// Default colors
+
 .pager {
+  --backgroundColor1: #333333;
+  --foregroundColor1: #FFFFFF;
+  --backgroundColor2: #DDDDDDD;
+  --foregroundColor2: #333333;
+
+  &:before {
+    content: "";
+    display: block;
+    position: fixed;
+    left: calc(50% - 1px);
+    width: 2px;
+    height: 100vh;
+    top: 0;
+    background-color: red;
+  }
+  &:after {
+    content: "";
+    display: block;
+    position: fixed;
+    top: calc(50% - 1px);
+    height: 2px;
+    width: 100vw;
+    left:0;
+    background-color: red;
+  }
+
   width: 100vw;
   min-height: 100vh;
 
@@ -11,9 +42,39 @@
   transition: transform 750ms;
 
   .container {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: fit-content;
     height: fit-content;
+  }
+
+  /* Generic Arrow */
+  .arrow {
+    &:before {
+      font-size: 30px;
+      line-height: 60px;
+      font-family: 'Material Symbols Outlined';
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 200, 'opsz' 48;
+      opacity: 0.1;
+      transition: all 0.2s;
+    }
+
+
+    position: absolute;
+    display: block;
+    width: 30px;
+    height: 60px;
+    cursor: pointer;
+    transform: scale(0.5);
+
+    &:hover {
+      transform: scale(1);
+      &:before {
+        opacity: 1;
+        font-size: 50px;
+      }
+    }
   }
 
   .section {
@@ -21,8 +82,42 @@
     flex-direction: row;
     width: 100vw;
     min-height: 100vh;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
+    position: relative;
+    flex-wrap: nowrap;
+
+    &:nth-child(2n) {
+      background-color: var(--backgroundColor1);
+      color: var(--foregroundColor1);
+    }
+
+    &:nth-child(2n+1) {
+      background-color: var(--backgroundColor2);
+      color: var(--foregroundColor2);
+    }
+
+    // Vertical arrow
+    > .arrow {
+      left: calc(50% - 25px);
+      width: 50px;
+      text-align:center;
+      &.prev {
+        top: 5px;
+        &:before {
+          content: '\eacf';
+        }
+        transform-origin: 50% 0;
+      }
+
+      &.next {
+        bottom: 5px;
+        &:before {
+          content: '\ead0';
+        }
+        transform-origin: 50% 100%;
+      }
+    }
 
     &.slides {
       justify-content: start;
@@ -38,18 +133,54 @@
     .slide {
       display: flex;
       width: 100vw;
+      box-sizing: border-box;
+      padding: 30px 60px;
       min-height: 100vh;
       justify-content: center;
       align-items: center;
+      position: relative;
+      // Horizontal Arrow
+      > .arrow {
+        top: calc(50% - 30px);
+
+        &.prev {
+          left: 15px;
+          text-align:left;
+          transform-origin: 0 50%;
+          &:before {
+            content: '\e5e0';
+          }
+        }
+
+        &.next {
+          right: 15px;
+          transform-origin: 100% 50%;
+          text-align:right;
+          &:before {
+            content: '\e5e1';
+          }
+        }
+      }
+
+      &:nth-child(2n) {
+        filter: brightness(0.8);
+      }
+
+      &:nth-child(2n+1) {
+        filter: brightness(0.99);
+      }
     }
   }
 
   &.zoom {
+    .arrow {
+      opacity: 0;
+    }
+
     .section {
       &.slides {
         overflow-x: visible;
       }
-
 
 
       .container {
@@ -62,6 +193,7 @@
         cursor: pointer;
       }
     }
+
     .active {
       .container {
         opacity: 1

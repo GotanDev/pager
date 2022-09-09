@@ -19,6 +19,10 @@ function pager(cssSelector, options = {}) {
                 section: false,
                 // Loop horizontal navigation
                 slide: true
+            },
+            arrows: {
+                section: false,
+                slide: true
             }
 
         };
@@ -58,6 +62,33 @@ function pager(cssSelector, options = {}) {
                 if (section.id == '') {
                     section.id = `section-${sectionCount}`;
                 }
+
+                if (section.querySelector('.slide, slide') == null) { // Only one slide & forgotten slide tag
+                    this.addIntermediateContainer(section, 'slide');
+                }
+                this.addIntermediateContainer(section);
+
+
+                if (this.options.arrows.section) {
+                    if (section.previousElementSibling != null || this.options.infinite.section) {
+                        const arrow = document.createElement('arrow');
+                        arrow.classList.add('prev', 'arrow');
+                        arrow.onclick = this.previousSection;
+                        section.appendChild(arrow);
+                    }
+                    if (section.nextElementSibling != null || this.options.infinite.section) {
+                        const arrow = document.createElement('arrow');
+                        arrow.classList.add('next', 'arrow');
+                        arrow.onclick = this.nextSection;
+                        section.appendChild(arrow);
+                    }
+                }
+                const slidesCount = section.querySelectorAll('.slide').length;
+                if (slidesCount > 1) {
+                    // Define global with for multi slides section
+                    (section.querySelector('.container') as HTMLElement).style.width = (100 * slidesCount) + 'vw';
+                    section.classList.add('slides');
+                }
                 let slideCount = 0;
                 section.querySelectorAll('slide, .slide').forEach(slide => {
                     (slide as HTMLElement).classList.add('slide');
@@ -66,11 +97,30 @@ function pager(cssSelector, options = {}) {
                     if (slide.id == '') {
                         slide.id = `slide-${sectionCount}-${slideCount}`;
                     }
+                    // Add intermediate container in each level to allow scrolling
+                    this.addIntermediateContainer(slide);
+
+                    if (slide.previousElementSibling != null || this.options.infinite.slide) {
+                        let arrow = document.createElement('arrow');
+                        arrow.classList.add('prev', 'arrow');
+                        arrow.onclick = this.previousSlide;
+                        slide.appendChild(arrow);
+                    }
+                    if (slide.nextElementSibling != null || this.options.infinite.slide) {
+                        let arrow = document.createElement('arrow');
+                        arrow.classList.add('next', 'arrow');
+                        arrow.onclick = this.nextSlide;
+                        slide.appendChild(arrow);
+                    }
                     slideCount++;
                 });
                 sectionCount++;
             });
+            // Construct required DOM structure
+            this.container.querySelectorAll('.section').forEach(section => {
 
+
+            });
 
             // Copy main functions to DOM
             (this.container as any).toggleZoom = this.toggleZoom;
@@ -80,20 +130,6 @@ function pager(cssSelector, options = {}) {
             (this.container as any).previousSlide = this.previousSlide;
             (this.container as any).nextSection = this.nextSection;
             (this.container as any).previousSection = this.previousSection;
-
-
-            // Construct required DOM structure
-            this.container.querySelectorAll('.section').forEach(section => {
-                this.addIntermediateContainer(section);
-                const slidesCount = section.querySelectorAll('.slide').length;
-                if (slidesCount > 1) {
-                    // Define global with for multi slides section
-                    (section.querySelector('.container') as HTMLElement).style.width = (100 * slidesCount) + 'vw';
-                    section.classList.add('slides');
-                    // Add intermediate container in each level to allow scrolling
-                    section.querySelectorAll('.slide').forEach(this.addIntermediateContainer);
-                }
-            });
 
 
             if (this.options.keyboard) {
@@ -110,7 +146,7 @@ function pager(cssSelector, options = {}) {
                             if (pager.classList.contains('zoom')) {
                                 pager.querySelectorAll('.active').forEach(a => a.classList.remove('active'));
                                 pager.toggleZoom();
-                                setTimeout(function(pager, element){
+                                setTimeout(function (pager, element) {
                                     pager.gotoElement(element);
                                 }, 750, pager, this)
 
@@ -133,11 +169,12 @@ function pager(cssSelector, options = {}) {
         /** Ajoute un conteneur intermédiaire à l'emplacement où il y a du contenu
          *
          * @param section
+         * @param tagName Tag name for intermediate container
          * @private
          */
-        private addIntermediateContainer(section: Element) {
-            const container = document.createElement('container');
-            container.classList.add('container');
+        private addIntermediateContainer(section: Element, tagName = 'container') {
+            const container = document.createElement(tagName);
+            container.classList.add(tagName);
             container.innerHTML = section.innerHTML;
             section.innerHTML = '';
             section.appendChild(container);
@@ -164,8 +201,8 @@ function pager(cssSelector, options = {}) {
 
         /** Shortcuts for keyboard navigation
          *
-         * @param KeyboardEvent Must contain .key attribute
          * @private
+         * @param event KeyboardEvent
          */
         private keyboardShortcuts(event: KeyboardEvent): void {
             const container = (document.querySelector('.pager') as any);
@@ -199,7 +236,7 @@ function pager(cssSelector, options = {}) {
                 return;
             }
 
-            container.querySelectorAll('.section').forEach(s => s.scrollTo(0,0));
+            container.querySelectorAll('.section').forEach(s => s.scrollTo(0, 0));
 
             container.dispatchEvent(new CustomEvent("zoom"));
             if (container.classList.contains('zoom')) {
@@ -227,7 +264,7 @@ function pager(cssSelector, options = {}) {
             const container = (document.querySelector('.pager') as any);
             container.querySelectorAll('.active').forEach(a => a.classList.remove('active'));
 
-            if(container.classList.contains('zoom')) {
+            if (container.classList.contains('zoom')) {
                 container.toggleZoom();
             }
 
@@ -254,7 +291,7 @@ function pager(cssSelector, options = {}) {
             });
             if (activeElement.classList.contains('slide')) {
                 activeElement.closest('.section').scrollBy({
-                    left:  activeElement.offsetLeft - (isNaN(activeElement.scrollX) ? 0 : activeElement.scrollX),
+                    left: activeElement.offsetLeft - (isNaN(activeElement.scrollX) ? 0 : activeElement.scrollX),
                     top: 0,
                     behavior: scrollBehavior
                 });
@@ -281,7 +318,7 @@ function pager(cssSelector, options = {}) {
             } else if (activeElement.classList.contains('slide')) {
                 const slideId = parseInt(activeElement.dataset.slideId);
                 if (activeElement.nextElementSibling == null) {
-                    if (this.options.infinite.slide) {
+                    if (pager.options.infinite.slide) {
                         targetElement = (activeElement.parentElement.firstElementChild as HTMLElement);
                     }
                 } else {
@@ -308,7 +345,7 @@ function pager(cssSelector, options = {}) {
             } else {
                 const slideId = parseInt(activeElement.dataset.slideId);
                 if (activeElement.previousElementSibling == null) {
-                    if (this.options.infinite.slide) {
+                    if (pager.options.infinite.slide) {
                         targetElement = ((activeElement.parentElement.lastElementChild as HTMLElement));
                     }
                 } else {
@@ -332,7 +369,7 @@ function pager(cssSelector, options = {}) {
             const sectionId = parseInt(activeElement.dataset.sectionId)
             let targetElement = null;
             if (activeElement.nextElementSibling == null) {
-                if (this.options.infinite.section) {
+                if (pager.options.infinite.section) {
                     targetElement = (activeElement.parentElement.firstElementChild as HTMLElement);
                 }
             } else {
@@ -354,7 +391,7 @@ function pager(cssSelector, options = {}) {
             const sectionId = parseInt(activeElement.dataset.sectionId)
             let targetElement = null;
             if (activeElement.previousElementSibling == null) {
-                if (this.options.infinite.section) {
+                if (pager.options.infinite.section) {
                     targetElement = (activeElement.parentElement.lastElementChild as HTMLElement);
                 }
             } else {
